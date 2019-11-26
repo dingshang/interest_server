@@ -59,7 +59,25 @@ int main()
 		if (ret >= 0)
 		{
 			printf("read msg, size[%i]:[%s]\n", ret, buff);
+
+			// services
+			if (buff[0] == '1')
+			{
+				printf("client choose service 1: echo service\n");
+				char string[ret-1];
+				for (int i=1; i<ret; i++)
+				{
+					string[i-1] = buff[i];
+				}
+				ret = write(client_fd, string, ret-1);
+				if (ret < 0)
+				{
+					printf("echo service write fail\n");
+					return ret;
+				}
+			}
 		}
+		printf("\n");
 	}
 
 	return 0;

@@ -34,14 +34,31 @@ int main()
 		return ret;
 	}
 
-	// write msg
-	char msg[] = "hello";
-	printf("write msg ...\n");
-	ret = write(sockfd, msg, sizeof(msg));
-	if (ret == -1)
+
+	int service = 1;
+	// service echo
+	if (service == 1)
 	{
-		printf("write fail\n");
-		return ret;
+		// write msg
+		char msg[] = "1hello";
+		printf("write msg ...\n");
+		ret = write(sockfd, msg, sizeof(msg));
+		if (ret == -1)
+		{
+			printf("write fail\n");
+			return ret;
+		}
+
+		// read msg
+		#define BUFF_SIZE 1024
+		char buff[BUFF_SIZE];
+		ret = read(sockfd, buff, BUFF_SIZE);
+		if (ret == -1)
+		{
+			printf("echo read fail\n");
+			return ret;
+		}
+		printf("echo read:%s\n", buff);
 	}
 
 	// close socket
