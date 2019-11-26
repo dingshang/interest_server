@@ -3,23 +3,34 @@
 #include<arpa/inet.h>
 #include<unistd.h>
 
+#define BUFF_SIZE 1024
+#define DEBUG 1
 
-int main()
+int debug_printf(const char * format, ...)
+{
+	if (DEBUG)
+	{
+		printf("[debug] ");
+		printf(format);
+	}
+}
+
+int client_proxy(int service, char * buff, int size)
 {
 
 	int ret = 0;
 
 	// create socket
-	printf("create socket ...\n");
+	debug_printf("create socket ...\n");
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd == -1)
 	{
-		printf("create socket fail\n");
+		debug_printf("create socket fail\n");
 		return sockfd;
 	}
 
 	// connect server
-	printf("connect ...\n");
+	debug_printf("connect ...\n");
 	struct sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(8000);
@@ -30,45 +41,85 @@ int main()
 
 	if(ret == -1)
 	{
-		printf("connect fail\n");
+		debug_printf("connect fail\n");
 		return ret;
 	}
 
 
-	int service = 1;
 	// service echo
 	if (service == 1)
 	{
 		// write msg
-		char msg[] = "1hello";
-		printf("write msg ...\n");
-		ret = write(sockfd, msg, sizeof(msg));
+		debug_printf("write msg ...\n");
+		ret = write(sockfd, buff, size);
 		if (ret == -1)
 		{
-			printf("write fail\n");
+			debug_printf("write fail\n");
 			return ret;
 		}
 
 		// read msg
-		#define BUFF_SIZE 1024
-		char buff[BUFF_SIZE];
-		ret = read(sockfd, buff, BUFF_SIZE);
+		ret = read(sockfd, buff, size);
 		if (ret == -1)
 		{
-			printf("echo read fail\n");
+			debug_printf("echo read fail\n");
 			return ret;
 		}
-		printf("echo read:%s\n", buff);
+		debug_printf("echo read:%s\n", buff);
 	}
 
 	// close socket
-	printf("close socket ...\n");
+	debug_printf("close socket ...\n");
 	ret = close(sockfd);
 	if (ret == -1)
 	{
-		printf("close socket fail\n");
+		debug_printf("close socket fail\n");
 		return ret;
 	}
 
 	return 0;
+}
+
+void echo_interface()
+{
+	printf("press your words:\n");
+	char buff[BUFF_SIZE];
+	
+	scanf("%s", &buff[1]);
+	printf("you pressed: %s\n", &buff[1]);
+	buff[0] = '1';
+	client_proxy(1, buff, BUFF_SIZE);
+	printf("server echo:%s\n", buff);
+}
+
+int client_interface()
+{
+	printf("=====Interest Client=====\n");
+	printf("service 1: Echo\n");
+	printf("press your choice:");
+	int num_got = 0;
+	scanf("%i", &num_got);
+	printf("you pressed:%d\n", num_got);
+	if (num_got == 1)
+	{
+		echo_interface();
+	}
+	else
+	{
+		printf("invalued number!\n");
+	}
+	printf("press any to continue\n");
+	char ch;
+	scanf("%c", &ch);
+	scanf("%c", &ch);
+
+	client_interface();
+
+	return 0;
+}
+
+
+int main()
+{
+	return client_interface();
 }

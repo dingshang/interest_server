@@ -3,7 +3,7 @@
 #include<arpa/inet.h>
 #include<unistd.h>
 
-int main()
+int service()
 {
 
 	// create socket
@@ -81,5 +81,10 @@ int main()
 	}
 
 	return 0;
+}
+
+int main()
+{
+	return service();
 }
 
