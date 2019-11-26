@@ -97,21 +97,22 @@ int client_interface()
 	printf("=====Interest Client=====\n");
 	printf("service 1: Echo\n");
 	printf("press your choice:");
-	int num_got = 0;
-	scanf("%i", &num_got);
-	printf("you pressed:%d\n", num_got);
-	if (num_got == 1)
+	char buff[BUFF_SIZE];
+	scanf("%s", buff);
+	printf("you pressed:%s\n", buff);
+	
+	if (buff[0] == '1' && buff[1] == '\0')
 	{
 		echo_interface();
 	}
 	else
 	{
-		printf("invalued number!\n");
+		printf("invalued input!\n");
 	}
 	printf("press any to continue\n");
 	char ch;
 	scanf("%c", &ch);
-	scanf("%c", &ch);
+	scanf("%s", buff);
 
 	client_interface();
 
