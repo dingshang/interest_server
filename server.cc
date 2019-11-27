@@ -3,8 +3,12 @@
 #include<arpa/inet.h>
 #include<unistd.h>
 
+#define BUFF_SIZE 1024
+
 int service()
 {
+
+	char client_box[BUFF_SIZE];
 
 	// create socket
 	printf("create socket ...\n");
@@ -53,7 +57,6 @@ int service()
 		printf("client fd:%i;", client_fd);
 		printf(" ip:%s;", inet_ntoa(client_addr.sin_addr));
 		printf(" port:%i\n", client_addr.sin_port);
-		#define BUFF_SIZE 1024
 		char buff[BUFF_SIZE];
 		ret = read(client_fd, buff, BUFF_SIZE);
 		if (ret >= 0)
@@ -75,6 +78,26 @@ int service()
 					printf("echo service write fail\n");
 					return ret;
 				}
+			}
+			else if (buff[0] == '2')
+			{
+				printf("client choose service 2: put service\n");
+				for (int i=1; i<ret; i++)
+				{
+					client_box[i-1] = buff[i];
+				}
+				printf("put words into client box:%s", client_box);
+			}
+			else if (buff[0] == '3')
+			{
+				printf("client choose service 3: get service\n");
+				ret = write(client_fd, client_box, BUFF_SIZE);
+				if (ret < 0)
+				{
+					printf("get service write fail\n");
+					return ret;
+				}
+		
 			}
 		}
 		printf("\n");

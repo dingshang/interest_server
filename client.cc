@@ -67,6 +67,37 @@ int client_proxy(int service, char * buff, int size)
 		}
 		debug_printf("echo read:%s\n", buff);
 	}
+	else if (service == 2)
+	{
+		// write msg
+		debug_printf("write msg ...\n");
+		ret = write(sockfd, buff, size);
+		if (ret == -1)
+		{
+			debug_printf("write fail\n");
+			return ret;
+		}
+	}
+	else if (service ==3)
+	{
+		// write msg
+		debug_printf("write msg ...\n");
+		ret = write(sockfd, buff, size);
+		if (ret == -1)
+		{
+			debug_printf("write fail\n");
+			return ret;
+		}
+
+		// read msg
+		ret = read(sockfd, buff, size);
+		if (ret == -1)
+		{
+			debug_printf("get read fail\n");
+			return ret;
+		}
+		debug_printf("get read:%s\n", buff);
+	}
 
 	// close socket
 	debug_printf("close socket ...\n");
@@ -92,10 +123,30 @@ void echo_interface()
 	printf("server echo:%s\n", buff);
 }
 
+void put_interface()
+{
+	printf("press your words:\n");
+	char buff[BUFF_SIZE];
+	
+	scanf("%s", &buff[1]);
+	buff[0] = '2';
+	client_proxy(2, buff, BUFF_SIZE);
+}
+
+void get_interface()
+{
+	char buff[BUFF_SIZE];
+	buff[0] = '3';
+	client_proxy(3, buff, BUFF_SIZE);
+	printf("get from server:%s\n", buff);
+}
+
 int client_interface()
 {
 	printf("=====Interest Client=====\n");
 	printf("service 1: Echo\n");
+	printf("service 2: Put\n");
+	printf("service 3: Get\n");
 	printf("press your choice:");
 	char buff[BUFF_SIZE];
 	scanf("%s", buff);
@@ -104,6 +155,14 @@ int client_interface()
 	if (buff[0] == '1' && buff[1] == '\0')
 	{
 		echo_interface();
+	}
+	else if (buff[0] == '2' && buff[1] == '\0')
+	{
+		put_interface();
+	}
+	else if (buff[0] == '3' && buff[1] == '\0')
+	{
+		get_interface();
 	}
 	else
 	{
