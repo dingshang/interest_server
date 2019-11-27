@@ -8,8 +8,6 @@
 int service()
 {
 
-	char client_box[BUFF_SIZE];
-
 	// create socket
 	printf("create socket ...\n");
 
@@ -82,16 +80,43 @@ int service()
 			else if (buff[0] == '2')
 			{
 				printf("client choose service 2: put service\n");
-				for (int i=1; i<ret; i++)
+
+				// write into file
+				FILE * f = fopen("client_box.txt", "w");
+				if (f < 0)
 				{
-					client_box[i-1] = buff[i];
+					printf("open file fail\n");
+					return -1;
 				}
-				printf("put words into client box:%s", client_box);
+				ret = fwrite(&buff[1], sizeof(char), BUFF_SIZE-1, f);
+				if (ret < 0)
+				{
+					printf("write into file fail\n");
+					return ret;
+				}
+				ret = fclose(f);
+				if (ret < 0)
+				{
+					printf("close file fail\n");
+					return ret;
+				}
+
 			}
 			else if (buff[0] == '3')
 			{
 				printf("client choose service 3: get service\n");
-				ret = write(client_fd, client_box, BUFF_SIZE);
+
+				// read from file
+				FILE * f = fopen("client_box.txt", "r");
+				char buff[BUFF_SIZE];
+				ret = fread(buff, sizeof(char), BUFF_SIZE, f);
+				if (ret < 0)
+				{
+					printf("read file fail\n");
+					return ret;
+				}
+
+				ret = write(client_fd, buff, BUFF_SIZE);
 				if (ret < 0)
 				{
 					printf("get service write fail\n");
