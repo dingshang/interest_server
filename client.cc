@@ -114,30 +114,30 @@ int client_proxy(int service, char * buff, int size)
 void echo_interface()
 {
 	printf("press your words:\n");
-	char buff[BUFF_SIZE];
+	char buff[BUFF_SIZE+1];
 	
 	scanf("%s", &buff[1]);
 	printf("you pressed: %s\n", &buff[1]);
 	buff[0] = '1';
-	client_proxy(1, buff, BUFF_SIZE);
+	client_proxy(1, buff, BUFF_SIZE+1);
 	printf("server echo:%s\n", buff);
 }
 
 void put_interface()
 {
 	printf("press your words:\n");
-	char buff[BUFF_SIZE];
+	char buff[BUFF_SIZE+1];
 	
 	scanf("%s", &buff[1]);
 	buff[0] = '2';
-	client_proxy(2, buff, BUFF_SIZE);
+	client_proxy(2, buff, BUFF_SIZE+1);
 }
 
 void get_interface()
 {
-	char buff[BUFF_SIZE];
+	char buff[BUFF_SIZE+1];
 	buff[0] = '3';
-	client_proxy(3, buff, BUFF_SIZE);
+	client_proxy(3, buff, BUFF_SIZE+1);
 	printf("get from server:%s\n", buff);
 }
 

@@ -55,8 +55,8 @@ int service()
 		printf("client fd:%i;", client_fd);
 		printf(" ip:%s;", inet_ntoa(client_addr.sin_addr));
 		printf(" port:%i\n", client_addr.sin_port);
-		char buff[BUFF_SIZE];
-		ret = read(client_fd, buff, BUFF_SIZE);
+		char buff[BUFF_SIZE+1];
+		ret = read(client_fd, buff, BUFF_SIZE+1);
 		if (ret >= 0)
 		{
 			printf("read msg, size[%i]:[%s]\n", ret, buff);
@@ -88,7 +88,7 @@ int service()
 					printf("open file fail\n");
 					return -1;
 				}
-				ret = fwrite(&buff[1], sizeof(char), BUFF_SIZE-1, f);
+				ret = fwrite(&buff[1], sizeof(char), BUFF_SIZE, f);
 				if (ret < 0)
 				{
 					printf("write into file fail\n");
