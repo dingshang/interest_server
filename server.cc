@@ -2,6 +2,7 @@
 #include<sys/socket.h>
 #include<arpa/inet.h>
 #include<unistd.h>
+#include<string.h>
 
 #define BUFF_SIZE 1024
 
@@ -123,6 +124,28 @@ int service()
 					return ret;
 				}
 		
+			}
+			else if (buff[0]=='G' && buff[1]=='E' && buff[2]=='T')
+			{
+				printf("client request GET\n");
+				
+				char response[] = 
+				"HTTP/1.1 200 OK\r\n"
+				"Content-Type: text/html\r\n\r\n"
+				"bad html\r\n";
+
+				ret = write(client_fd, response, strlen(response));	
+				printf("write ret=%d", ret);
+				if (ret <= 0)
+				{
+					printf("write fail!\n");
+				}
+				
+				close(client_fd); // FIXME IMPORTANT: client will block without close
+			}
+			else
+			{
+				printf("Unknown client request!\n");
 			}
 		}
 		printf("\n");
