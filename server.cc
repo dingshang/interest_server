@@ -8,6 +8,7 @@
 
 int service()
 {
+	int ret;
 
 	// create socket
 	printf("create socket ...\n");
@@ -27,7 +28,7 @@ int service()
 	addr.sin_port = htons(8000);
 	addr.sin_addr.s_addr = inet_addr("192.168.122.1");
 
-	int ret = bind(sockfd, (struct sockaddr *) &addr, sizeof(addr));
+	ret = bind(sockfd, (struct sockaddr *) &addr, sizeof(addr));
 	if (ret == -1)
 	{
 		printf("bind socket fail\n");
@@ -51,7 +52,7 @@ int service()
 	client_fd = 0;
 	while (client_fd != -1)
 	{
-		printf("accept socket ...\n");
+		printf("\naccept socket blocking ...\n");
 		client_fd = accept(sockfd, (struct sockaddr *) &client_addr, &addr_len);
 		printf("client fd:%i;", client_fd);
 		printf(" ip:%s;", inet_ntoa(client_addr.sin_addr));
@@ -60,7 +61,7 @@ int service()
 		ret = read(client_fd, buff, BUFF_SIZE+1);
 		if (ret >= 0)
 		{
-			printf("read msg, size[%i]:[%s]\n", ret, buff);
+			printf("read msg, size[%i]:\n%s\n", ret, buff);
 
 			// services
 			if (buff[0] == '1')
@@ -127,7 +128,7 @@ int service()
 			}
 			else if (buff[0]=='G' && buff[1]=='E' && buff[2]=='T')
 			{
-				printf("client request GET\n");
+				printf("client request http GET\n");
 				
 				char response[] = 
 				"HTTP/1.1 200 OK\r\n"
