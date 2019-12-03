@@ -132,7 +132,9 @@ int service()
 				char response[] = 
 				"HTTP/1.1 200 OK\r\n"
 				"Content-Type: text/html\r\n\r\n"
-				"bad html\r\n";
+				"<!DOCTYPE html><html><body>\r\n"
+				"<h1>For your Interest!</h1>\r\n"
+				"</body></html>\r\n";
 
 				ret = write(client_fd, response, strlen(response));	
 				printf("write ret=%d", ret);
