@@ -24,11 +24,11 @@ int service()
 	// create socket
 	printf("create socket ...\n");
 
-	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd == -1)
+	int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (server_fd == -1)
 	{
 		printf("create socket fail\n");
-		return sockfd;
+		return server_fd;
 	}	
 
 	// bind socket
@@ -39,7 +39,7 @@ int service()
 	addr.sin_port = htons(8000);
 	addr.sin_addr.s_addr = inet_addr("192.168.122.1");
 
-	ret = bind(sockfd, (struct sockaddr *) &addr, sizeof(addr));
+	ret = bind(server_fd, (struct sockaddr *) &addr, sizeof(addr));
 	if (ret == -1)
 	{
 		printf("bind socket fail\n");
@@ -49,7 +49,7 @@ int service()
 	// listen socket
 	printf("listen socket ...\n");
 	int backlog = 50;
-	ret = listen(sockfd, backlog);
+	ret = listen(server_fd, backlog);
 	if (ret == -1)
 	{
 		printf("listen socket fail\n");
@@ -64,16 +64,16 @@ int service()
 	while (client_fd != -1)
 	{
 		printf("\naccept socket blocking ...\n");
-		client_fd = accept(sockfd, (struct sockaddr *) &client_addr, &addr_len);
+		client_fd = accept(server_fd, (struct sockaddr *) &client_addr, &addr_len);
 
 
 		if (!fork())
 		{ /* child process */
 
-			close(sockfd); 
-										 // close sockfd and exit(0): 4,4,4,...
-										 // not close sockfd and exit(0): 4,4,4,...
-										 // not close sockfd and not exit(0): 4,4,4,..
+			close(server_fd); 
+										 // close server_fd and exit(0): 4,4,4,...
+										 // not close server_fd and exit(0): 4,4,4,...
+										 // not close server_fd and not exit(0): 4,4,4,..
 			printf("client fd:%i;", client_fd);
 			printf(" ip:%s;", inet_ntoa(client_addr.sin_addr));
 			printf(" port:%i\n", client_addr.sin_port);
