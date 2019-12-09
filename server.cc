@@ -78,100 +78,104 @@ int service()
 
 			char buff[BUFF_SIZE+1];
 			ret = read(client_fd, buff, BUFF_SIZE+1);
-			if (ret >= 0)
+			if (ret < 0)
 			{
-				printf("read msg, size[%i]:\n%s\n", ret, buff);
+				printf("read from client_fd fail\n");
+				return ret;
+			}
 
-				// services
-				if (buff[0] == '1')
+			printf("read msg, size[%i]:\n%s\n", ret, buff);
+
+			// services
+			if (buff[0] == '1')
+			{
+				printf("client choose service 1: echo service\n");
+				char string[ret-1];
+				for (int i=1; i<ret; i++)
 				{
-					printf("client choose service 1: echo service\n");
-					char string[ret-1];
-					for (int i=1; i<ret; i++)
-					{
-						string[i-1] = buff[i];
-					}
-					ret = write(client_fd, string, ret-1);
-					if (ret < 0)
-					{
-						printf("echo service write fail\n");
-						return ret;
-					}
+					string[i-1] = buff[i];
 				}
-				else if (buff[0] == '2')
+				ret = write(client_fd, string, ret-1);
+				if (ret < 0)
 				{
-					printf("client choose service 2: put service\n");
-
-					// write into file
-					FILE * f = fopen("client_box.txt", "w");
-					if (f < 0)
-					{
-						printf("open file fail\n");
-						return -1;
-					}
-					ret = fwrite(&buff[1], sizeof(char), BUFF_SIZE, f);
-					if (ret < 0)
-					{
-						printf("write into file fail\n");
-						return ret;
-					}
-					ret = fclose(f);
-					if (ret < 0)
-					{
-						printf("close file fail\n");
-						return ret;
-					}
-
+					printf("echo service write fail\n");
+					return ret;
 				}
-				else if (buff[0] == '3')
+			}
+			else if (buff[0] == '2')
+			{
+				printf("client choose service 2: put service\n");
+
+				// write into file
+				FILE * f = fopen("client_box.txt", "w");
+				if (f < 0)
 				{
-					printf("client choose service 3: get service\n");
-
-					// read from file
-					FILE * f = fopen("client_box.txt", "r");
-					char buff[BUFF_SIZE];
-					ret = fread(buff, sizeof(char), BUFF_SIZE, f);
-					if (ret < 0)
-					{
-						printf("read file fail\n");
-						return ret;
-					}
-
-					ret = write(client_fd, buff, BUFF_SIZE);
-					if (ret < 0)
-					{
-						printf("get service write fail\n");
-						return ret;
-					}
-			
+					printf("open file fail\n");
+					return -1;
 				}
-				else if (buff[0]=='G' && buff[1]=='E' && buff[2]=='T')
+				ret = fwrite(&buff[1], sizeof(char), BUFF_SIZE, f);
+				if (ret < 0)
 				{
-					printf("client request http GET\n");
-					
-					char response[] = 
-					"HTTP/1.1 200 OK\r\n"
-					"Content-Type: text/html\r\n\r\n"
-					"<!DOCTYPE html><html><body>\r\n"
-					"<h1>For your Interest!</h1>\r\n"
-					"</body></html>\r\n";
-
-					ret = write(client_fd, response, strlen(response));	
-					printf("write ret=%d", ret);
-					if (ret <= 0)
-					{
-						printf("write fail!\n");
-					}
-					
-					close(client_fd); // FIXME IMPORTANT: client will block without close
+					printf("write into file fail\n");
+					return ret;
 				}
-				else
+				ret = fclose(f);
+				if (ret < 0)
 				{
-					printf("Unknown client request!\n");
+					printf("close file fail\n");
+					return ret;
 				}
+
+			}
+			else if (buff[0] == '3')
+			{
+				printf("client choose service 3: get service\n");
+
+				// read from file
+				FILE * f = fopen("client_box.txt", "r");
+				char buff[BUFF_SIZE];
+				ret = fread(buff, sizeof(char), BUFF_SIZE, f);
+				if (ret < 0)
+				{
+					printf("read file fail\n");
+					return ret;
+				}
+
+				ret = write(client_fd, buff, BUFF_SIZE);
+				if (ret < 0)
+				{
+					printf("get service write fail\n");
+					return ret;
+				}
+		
+			}
+			else if (buff[0]=='G' && buff[1]=='E' && buff[2]=='T')
+			{
+				printf("client request http GET\n");
+				
+				char response[] = 
+				"HTTP/1.1 200 OK\r\n"
+				"Content-Type: text/html\r\n\r\n"
+				"<!DOCTYPE html><html><body>\r\n"
+				"<h1>For your Interest!</h1>\r\n"
+				"</body></html>\r\n";
+
+				ret = write(client_fd, response, strlen(response));	
+				printf("write ret=%d\n", ret);
+				if (ret <= 0)
+				{
+					printf("write fail!\n");
+				}
+				
+				close(client_fd); // FIXME IMPORTANT: client will block without close
+			}
+			else
+			{
+				printf("Unknown client request!\n");
 			}
 			exit(0);
 		}
+
 		/* parent process */
 		close(client_fd); // FIXME IMPORTANT: client will block without close
 		printf("\n");
