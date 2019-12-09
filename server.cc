@@ -57,15 +57,12 @@ int service()
 	}
 
 	// accept
-	int client_fd = 0;
 	struct sockaddr_in client_addr;
 	socklen_t addr_len;
-	client_fd = 0;
-	while (client_fd != -1)
+	while (1)
 	{
-		printf("\naccept socket blocking ...\n");
-		client_fd = accept(server_fd, (struct sockaddr *) &client_addr, &addr_len);
-
+		printf("accept socket blocking ...\n");
+		int client_fd = accept(server_fd, (struct sockaddr *) &client_addr, &addr_len);
 
 		if (!fork())
 		{ /* child process */
@@ -74,9 +71,11 @@ int service()
 										 // close server_fd and exit(0): 4,4,4,...
 										 // not close server_fd and exit(0): 4,4,4,...
 										 // not close server_fd and not exit(0): 4,4,4,..
+
 			printf("client fd:%i;", client_fd);
 			printf(" ip:%s;", inet_ntoa(client_addr.sin_addr));
 			printf(" port:%i\n", client_addr.sin_port);
+
 			char buff[BUFF_SIZE+1];
 			ret = read(client_fd, buff, BUFF_SIZE+1);
 			if (ret >= 0)
