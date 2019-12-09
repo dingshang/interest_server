@@ -3,12 +3,23 @@
 #include<arpa/inet.h>
 #include<unistd.h>
 #include<string.h>
+#include<stdlib.h>
+#include<signal.h>
 
 #define BUFF_SIZE 1024
+
+void signal_func(int sig)
+{
+	printf("Got signal:%d\n", sig);
+	exit(0);
+}
 
 int service()
 {
 	int ret;
+
+	// deal with signal
+	signal(SIGINT, signal_func);	
 
 	// create socket
 	printf("create socket ...\n");
@@ -59,7 +70,10 @@ int service()
 		if (!fork())
 		{ /* child process */
 
-			close(sockfd); // client fd: -1 , OR 4 without close ??? FIXME
+			close(sockfd); 
+										 // close sockfd and exit(0): 4,4,4,...
+										 // not close sockfd and exit(0): 4,4,4,...
+										 // not close sockfd and not exit(0): 4,4,4,..
 			printf("client fd:%i;", client_fd);
 			printf(" ip:%s;", inet_ntoa(client_addr.sin_addr));
 			printf(" port:%i\n", client_addr.sin_port);
