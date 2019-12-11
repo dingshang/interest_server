@@ -30,7 +30,7 @@ void echo_service(int client_fd, char* buff, int size)
 	}
 }
 
-void put_service(int client_fd, char* buff, int size)
+int write_datafile(char* buff, int size)
 {
  	int ret = 0;
 	// write into file
@@ -38,22 +38,31 @@ void put_service(int client_fd, char* buff, int size)
 	if (f <= 0)
 	{
 		printf("open file fail\n");
-		close(client_fd);
-		exit(ret);
+		return ret;
 	}
 
-	ret = fwrite(&buff[1], sizeof(char), BUFF_SIZE, f);
+	ret = fwrite(buff, sizeof(char), size, f);
 	if (ret < 0)
 	{
 		printf("write into file fail\n");
 		fclose(f);
-		close(client_fd);
-		exit(ret);
+		return ret;
 	}
 	ret = fclose(f);
 	if (ret < 0)
 	{
 		printf("close file fail\n");
+		return ret;
+	}
+	return 0;
+}
+
+void put_service(int client_fd, char* buff, int size)
+{
+	int ret = write_datafile(&buff[1], BUFF_SIZE);	
+	if (ret < 0)
+	{
+		printf("put service fails!\n");
 		close(client_fd);
 		exit(ret);
 	}
@@ -103,6 +112,52 @@ void http_get_service(int client_fd)
 	"</body></html>\r\n";
 
 	ret = write(client_fd, response, strlen(response));	
+	if (ret <= 0)
+	{
+		printf("write fail!\n");
+		close(client_fd);
+		exit(ret);
+	}
+}
+
+void http_put_service(int client_fd, char *buff, int size)
+{
+	int ret = 0;
+
+	// get data
+	///find substring \r\n\r\n
+	int index = -1;
+	for(index = 0; index+3<size; index++)
+	{
+		if (buff[index] == '\r' &&
+				buff[index+1] == '\n' &&
+				buff[index+2] == '\r' &&
+				buff[index+3] == '\n')
+		{
+			break;
+		}
+	}
+	if (index+4 > size)
+	{
+		printf("No data\n");
+	}
+	else
+	{
+		printf("abstract data:%s\n", &buff[index+4]);
+	}
+
+	ret = write_datafile(&buff[index+4], strlen(&buff[index+4]));
+
+	char response_ok[] = 
+	"HTTP/1.1 200 OK\r\n"
+	"\r\n";
+	char response_bad[] = 
+	"HTTP/1.1 500 SERROR\r\n"
+	"\r\n";
+	char * presponse = response_ok;
+	if (ret < 0)
+		presponse = response_bad;
+	ret = write(client_fd, presponse, strlen(presponse));
 	if (ret <= 0)
 	{
 		printf("write fail!\n");
@@ -174,6 +229,7 @@ int service()
 			printf(" port:%i\n", client_addr.sin_port);
 
 			char buff[BUFF_SIZE+1];
+			memset(buff, 0, sizeof(buff));
 			ret = read(client_fd, buff, BUFF_SIZE+1);
 			if (ret < 0)
 			{
@@ -199,10 +255,15 @@ int service()
 				printf("client choose service 3: get service\n");
 				get_service(client_fd);
 			}
-			else if (buff[0]=='G' && buff[1]=='E' && buff[2]=='T')
+			else if (strncmp(buff, "GET", 3) == 0)
 			{
 				printf("client request http GET\n");
 				http_get_service(client_fd);	
+			}
+			else if (strncmp(buff, "PUT", 3) == 0)
+			{
+				printf("client request http PUT\n");
+				http_put_service(client_fd, buff, ret);
 			}
 			else
 			{
