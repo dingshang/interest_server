@@ -68,18 +68,44 @@ void put_service(int client_fd, char* buff, int size)
 	}
 }
 
+int read_data(char* buff, int size)
+{
+	int ret = 0;
+
+	FILE * f = fopen("client_box.txt", "r");
+	if (f <= 0)
+	{
+		printf("open file FAIL!\n");
+		return -1;
+	}
+
+	ret = fread(buff, sizeof(char), size, f);
+	if (ret < 0)
+	{
+		printf("read file FAIL!\n");
+		fclose(f);
+		return ret;
+	}
+
+	ret = fclose(f);
+	if (ret < 0)
+	{
+		printf("close file FAIL!\n");
+		return ret;
+	}
+
+	return ret;
+}
+
 void get_service(int client_fd)
 {
 	int ret = 0;
 
-	// read from file
-	FILE * f = fopen("client_box.txt", "r");
 	char buff[BUFF_SIZE];
-	ret = fread(buff, sizeof(char), BUFF_SIZE, f);
+	ret = read_data(buff, BUFF_SIZE);
 	if (ret < 0)
 	{
-		printf("read file fail\n");
-		fclose(f);
+		printf("read data FAIL!\n");
 		close(client_fd);
 		exit(ret);
 	}
@@ -87,19 +113,12 @@ void get_service(int client_fd)
 	ret = write(client_fd, buff, BUFF_SIZE);
 	if (ret < 0)
 	{
-		fclose(f);
+		printf("write to client FAIL!\n");
 		close(client_fd);
 		exit(ret);
 	}
 
-	fclose(f);
-	if (ret < 0)
-	{
-		printf("close file fail\n");
-		close(client_fd);
-		exit(ret);
-	}
-}
+}		
 
 void http_get_service(int client_fd)
 {
