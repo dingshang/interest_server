@@ -59,7 +59,7 @@ int write_datafile(char* buff, int size)
 
 void put_service(int client_fd, char* buff, int size)
 {
-	int ret = write_datafile(&buff[1], BUFF_SIZE);	
+	int ret = write_datafile(&buff[1], strlen(&buff[1]));	
 	if (ret < 0)
 	{
 		printf("put service fails!\n");
@@ -87,11 +87,11 @@ int read_data(char* buff, int size)
 		return ret;
 	}
 
-	ret = fclose(f);
-	if (ret < 0)
+	int ret2 = fclose(f);
+	if (ret2 < 0)
 	{
 		printf("close file FAIL!\n");
-		return ret;
+		return ret2;
 	}
 
 	return ret;
@@ -123,17 +123,54 @@ void get_service(int client_fd)
 void http_get_service(int client_fd)
 {
 	int ret = 0;
-	char response[] = 
+
+	char buff[BUFF_SIZE];
+	memset(buff, 0, BUFF_SIZE);
+	ret = read_data(buff, BUFF_SIZE);
+
+	char response_ok_1[] = 
 	"HTTP/1.1 200 OK\r\n"
 	"Content-Type: text/html\r\n\r\n"
 	"<!DOCTYPE html><html><body>\r\n"
 	"<h1>For your Interest!</h1>\r\n"
+	"<h1>";
+	
+	char response_ok_3[] =
+	"</h1>\r\n"
 	"</body></html>\r\n";
 
-	ret = write(client_fd, response, strlen(response));	
-	if (ret <= 0)
+	int len1 = strlen(response_ok_1);
+	int len3 = strlen(response_ok_3);
+	int len_str = len1 + ret + len3;
+	char response_ok[len_str+1];
+	int i=0, j=0;
+	
+	for	(i=0; i<len1; i++)
 	{
-		printf("write fail!\n");
+		response_ok[j] = response_ok_1[i];
+		j++;
+	}
+	for (i=0; i<ret; i++)
+	{
+		response_ok[j] = buff[i];
+		j++;
+	}
+	
+	for (i=0; i<len3; i++)
+	{
+		response_ok[j] = response_ok_3[i];
+		j++;
+	}
+	response_ok[j] = '\0';
+
+	char response_error[] = "HTTP/1.1 500 ERROR\r\n\r\n";
+
+	char * response = (ret >= 0) ? response_ok : response_error;
+
+	ret = write(client_fd, response, strlen(response));	
+	if (ret < 0)
+	{
+		printf("write to client FAIL!\n");
 		close(client_fd);
 		exit(ret);
 	}
