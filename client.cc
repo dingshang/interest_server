@@ -173,13 +173,14 @@ int client_interface()
 	// fgets(buff);
 	fgets(buff, sizeof(buff), stdin);
 
-	client_interface();
-
 	return 0;
 }
 
 
 int main()
 {
-	return client_interface();
+	while (1)
+		client_interface();
+
+	return 0;
 }
