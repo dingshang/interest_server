@@ -147,9 +147,10 @@ int client_interface()
 	printf("service 1: Echo\n");
 	printf("service 2: Put\n");
 	printf("service 3: Get\n");
-	printf("press your choice:");
+	printf("press your choice (Enter to finish):");
 	char buff[BUFF_SIZE];
-	scanf("%s", buff);
+	// gets(buff);
+	fgets(buff, sizeof(buff), stdin);
 	printf("you pressed:%s\n", buff);
 	
 	if (buff[0] == '1' && buff[1] == '\0')
@@ -169,9 +170,8 @@ int client_interface()
 		printf("invalued input!\n");
 	}
 	printf("press any to continue\n");
-	char ch;
-	scanf("%c", &ch);
-	scanf("%s", buff);
+	// fgets(buff);
+	fgets(buff, sizeof(buff), stdin);
 
 	client_interface();
 
