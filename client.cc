@@ -126,6 +126,10 @@ void echo_interface()
 	buff[0] = '1';
 	client_proxy(1, buff, BUFF_SIZE+1);
 	printf("server echo:%s\n", buff);
+	
+	// deal with last '\n'
+	char ch;
+	scanf("%c", &ch);
 }
 
 void put_interface()
@@ -136,6 +140,10 @@ void put_interface()
 	scanf("%s", &buff[1]);
 	buff[0] = '2';
 	client_proxy(2, buff, BUFF_SIZE+1);
+
+	// deal with last '\n'
+	char ch;
+	scanf("%c", &ch);
 }
 
 void get_interface()
@@ -158,15 +166,15 @@ int client_interface()
 	fgets(buff, sizeof(buff), stdin);
 	printf("you pressed:%s\n", buff);
 	
-	if (buff[0] == '1' && buff[1] == '\0')
+	if (buff[0] == '1' && buff[1] == '\n')
 	{
 		echo_interface();
 	}
-	else if (buff[0] == '2' && buff[1] == '\0')
+	else if (buff[0] == '2' && buff[1] == '\n')
 	{
 		put_interface();
 	}
-	else if (buff[0] == '3' && buff[1] == '\0')
+	else if (buff[0] == '3' && buff[1] == '\n')
 	{
 		get_interface();
 	}
