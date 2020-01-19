@@ -2,6 +2,7 @@
 #include<sys/socket.h>
 #include<arpa/inet.h>
 #include<unistd.h>
+#include<stdarg.h>
 
 #define BUFF_SIZE 1024
 #define DEBUG 1
@@ -11,7 +12,11 @@ int debug_printf(const char * format, ...)
 	if (DEBUG)
 	{
 		printf("[debug] ");
-		printf(format);
+
+		va_list args;
+		va_start(args, format);
+		vprintf(format, args);
+		va_end(args);
 	}
 }
 
