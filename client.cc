@@ -121,7 +121,7 @@ void echo_interface()
 	printf("press your words:\n");
 	char buff[BUFF_SIZE+1];
 	
-	scanf("%s", &buff[1]);
+	scanf("%[^\n]s", &buff[1]);
 	printf("you pressed: %s\n", &buff[1]);
 	buff[0] = '1';
 	client_proxy(1, buff, BUFF_SIZE+1);
@@ -137,7 +137,7 @@ void put_interface()
 	printf("press your words:\n");
 	char buff[BUFF_SIZE+1];
 	
-	scanf("%s", &buff[1]);
+	scanf("%[^\n]s", &buff[1]);
 	buff[0] = '2';
 	client_proxy(2, buff, BUFF_SIZE+1);
 
