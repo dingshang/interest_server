@@ -1,0 +1,27 @@
+1.protocol
+
+	server side:
+	1) recv string '1...'
+		server will return the data after '1'
+	2) recv string '2...'
+		server will store the data after '2' 
+	3) recv string '3...'
+		server will read from file and return data that put before
+
+	4) recv string 'PUT...'
+		server will store the data from the http frame
+	5) recv string 'GET...'
+		server will read from file and return data that put before
+
+	client side:		
+	1) echo service send string '1...' (... means data)
+
+	2) put service send string '2...' (... means data)
+	
+	3) get service send string '3'
+	
+	size:
+		The max size of the data we put, get and io from file is: 1K( 1024Bytes)
+
+
+
