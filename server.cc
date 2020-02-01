@@ -7,6 +7,7 @@
 #include<signal.h>
 
 #define BUFF_SIZE 1024
+#define OTHER_SIZE 1024
 
 void signal_func(int sig)
 {
@@ -284,9 +285,9 @@ int service()
 			printf(" ip:%s;", inet_ntoa(client_addr.sin_addr));
 			printf(" port:%i\n", client_addr.sin_port);
 
-			char buff[BUFF_SIZE+1];
+			char buff[BUFF_SIZE + OTHER_SIZE];
 			memset(buff, 0, sizeof(buff));
-			ret = read(client_fd, buff, BUFF_SIZE+1);
+			ret = read(client_fd, buff, sizeof(buff));
 			if (ret < 0)
 			{
 				printf("read from client_fd fail\n");
