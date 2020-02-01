@@ -127,42 +127,24 @@ void http_get_service(int client_fd)
 
 	char buff[BUFF_SIZE];
 	memset(buff, 0, BUFF_SIZE);
-	ret = read_data(buff, BUFF_SIZE);
+	ret = read_data(buff, sizeof(buff));
 
 	char response_ok_1[] = 
 	"HTTP/1.1 200 OK\r\n"
-	"Content-Type: text/html\r\n\r\n"
-	"<!DOCTYPE html><html><body>\r\n"
-	"<h1>For your Interest!</h1>\r\n"
-	"<h1>";
+	"Content-Type: text/html\r\n\r\n";
 	
-	char response_ok_3[] =
-	"</h1>\r\n"
-	"</body></html>\r\n";
+	int len_1 = strlen(response_ok_1);
+	int len_buff = sizeof(buff);
+	char response_ok[len_1 + len_buff + 1];
+	int i = 0;
+	for(i=0; i<len_1; i++)
+		response_ok[i]= response_ok_1[i];
 
-	int len1 = strlen(response_ok_1);
-	int len3 = strlen(response_ok_3);
-	int len_str = len1 + ret + len3;
-	char response_ok[len_str+1];
-	int i=0, j=0;
-	
-	for	(i=0; i<len1; i++)
-	{
-		response_ok[j] = response_ok_1[i];
-		j++;
-	}
-	for (i=0; i<ret; i++)
-	{
-		response_ok[j] = buff[i];
-		j++;
-	}
-	
-	for (i=0; i<len3; i++)
-	{
-		response_ok[j] = response_ok_3[i];
-		j++;
-	}
-	response_ok[j] = '\0';
+	int j = 0;
+	for(j=0; j<len_buff; j++)
+		response_ok[i+j] = buff[j];
+
+	response_ok[i+j] = '\0';
 
 	char response_error[] = "HTTP/1.1 500 ERROR\r\n\r\n";
 
