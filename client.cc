@@ -7,6 +7,8 @@
 #define BUFF_SIZE 1024
 #define DEBUG 1
 
+// add a test line
+
 int debug_printf(const char * format, ...)
 {
 	if (DEBUG)
